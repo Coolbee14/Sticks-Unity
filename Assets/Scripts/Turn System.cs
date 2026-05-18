@@ -631,4 +631,115 @@ public class TurnSystem : MonoBehaviour
 
 
 
+
+
+    //AI AGENT THINGS
+
+    /// <summary>
+    /// Allows the agent to get the hand value of any hand by inputting the player index and hand index. <br/><br/>
+    /// </summary>
+    /// <param name="playerIndex">Index of the player</param>
+    /// <param name="handIndex">Index of the hand from the player 'playerIndex'</param>
+    /// <returns>The hand value 'handIndex' of the player 'playerIndex'</returns>
+    public int GetHand(int playerIndex, int handIndex)
+    {
+        return GetHand(P[playerIndex][handIndex]);
+    }
+
+    /// <summary>
+    /// Tells the agent if they can use an alter button this turn. <br/><br/>
+    /// </summary>
+    /// <returns>Boolean value from the canAlter array</returns>
+    public bool CanCurrPlayerAlter()
+    {
+        return canAlter[currTurn - 1];
+    }
+
+    /// <summary>
+    /// Tells the agent the index of the current turn. <br/><br/>
+    /// </summary>
+    /// <returns>currTurn - 1</returns>
+    public int GetCurrTurnIndex()
+    {
+        return currTurn - 1;
+    }
+
+    /// <summary>
+    /// Allows the agent to directly attack by inputting the hand index of the attacker and defender. <br/><br/>
+    /// </summary>
+    /// <param name="attackerHandIndex">Index of the agent's attacking hand</param>
+    /// <param name="defenderHandIndex">Index of the other player's target hand</param>
+    public void DirectAttack(int attackerHandIndex, int defenderHandIndex)
+    {
+        int opponentIndex = GetOppPlayer(currTurn) - 1;
+
+        hands[currTurn - 1] = P[currTurn - 1][attackerHandIndex];
+        hands[opponentIndex] = P[opponentIndex][defenderHandIndex];
+
+        Attack();
+
+    }
+
+    /// <summary>
+    /// Allows the agent to directly use an alter button by inputting the action and hand index. <br/><br/>
+    /// </summary>
+    /// <param name="action">+ or - depending on the action (split is DirectSplit)</param>
+    /// <param name="handIndex">Index of the hand they want to alter (possibly used for highlighting in future)</param>
+    public void DirectAlter(string action, int handIndex)
+    {
+        hands[currTurn - 1] = P[currTurn - 1][handIndex];
+        Alter(action);
+    }
+
+    /// <summary>
+    /// Allows the agent to get the number of split combinations available for the current hand values. <br/><br/>
+    /// </summary>
+    /// <returns>Number of split combinations (1 - 3)</returns>
+    public int GetCurrSplitComboCount()
+    {
+        int split1 = GetHand(P[currTurn - 1][0]);
+        int split2 = GetHand(P[currTurn - 1][1]);
+        int total = split1 + split2;
+        List<int> combos = new List<int>();
+        for (int i = 0; i < total / 2 + 1; i++)
+        {
+            if (total - i >= 5) continue;
+            combos.Add(i);
+        }
+        return combos.Count;
+    }
+
+    /// <summary>
+    /// Allows the agent to directly split by inputting the combo index they want to split into based on the combinations found in SplitButtonsSetup(). <br/><br/>
+    /// </summary>
+    /// <param name="comboIndex">A number (0 - 2) to split by</param>
+    public void DirectSplit(int comboIndex)
+    {
+        int split1 = GetHand(P[currTurn - 1][0]);
+        int split2 = GetHand(P[currTurn - 1][1]);
+        int total = split1 + split2;
+        List<int> combos = new List<int>();
+
+        for (int i = 0; i < total / 2 + 1; i++)
+        {
+            if (total - i >= 5) continue;
+            combos.Add(i);
+        }
+
+        int[,] c = new int[combos.Count, 2];
+
+        for (int i = 0; i < c.GetLength(0); i++)
+        {
+            c[i, 0] = combos[i];
+            c[i, 1] = (total - combos[i]) % 5;
+        }
+
+        Split(c[comboIndex, 0], c[comboIndex, 1]);
+
+    }
+
+
+
+
+
 }
