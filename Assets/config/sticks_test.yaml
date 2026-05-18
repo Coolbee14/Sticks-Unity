@@ -1,0 +1,23 @@
+behaviors:
+  SticksBot:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 32          # Shrunk for quick collection
+      buffer_size: 256         # Low threshold so updates happen almost immediately
+      learning_rate: 3.0e-4
+    network_settings:
+      normalize: false
+      hidden_units: 64
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+    self_play:
+      window: 10
+      play_against_latest_model_ratio: 0.5
+      save_steps: 1000        # Takes a self-play snapshot very early
+      swap_steps: 200         # Forces opponent swaps frequently during the test
+    max_steps: 5000           # Short 2-3 minute run to ensure stability
+    time_horizon: 32
+    summary_freq: 1000        # Prints stats to your console quickly

@@ -28,6 +28,7 @@ public class TurnSystem : MonoBehaviour
     /// <summary>
     /// Player 1's hand 1
     /// </summary>
+    [Header("Game Objects")]
     [SerializeField] private GameObject P1H1;
     /// <summary>
     /// Player 1's hand 2
@@ -101,6 +102,16 @@ public class TurnSystem : MonoBehaviour
     [SerializeField] private GameObject endScreen;
 
     [SerializeField] private GameObject playerText;
+
+    /// <summary>
+    /// Reference to the ML-Agents AI handler script.
+    /// </summary>
+    [Header("AI Optimization")]
+    public SticksAgent agentP1;
+    public SticksAgent agentP2; //this is only for self play
+
+
+
 
     //Finding and Storing GameObjects
 
@@ -184,13 +195,29 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     public void PlayerSelect()
     {
-        if (!CheckWin())
+        bool isAIGame = agentP1 != null || agentP2 != null;
+        bool isGameOver = isAIGame ? (CheckWinSilent() != 0) : CheckWin(); //if it's an AI game, use CheckWinSilent to avoid unnecessary UI updates, if it's not, use CheckWin to update the UI with the win
+
+        if (!isGameOver)
         {
             Deselect();
             if (currPlayer != 1 && currPlayer != 2) Error("PlayerSelect() > currPlayer did not equal 1 or 2");
 
             else
             {
+                //AI AGENT LOGIC
+                if(currTurn == 1 && agentP1 != null)
+                {
+                    agentP1.RequestAction();
+                    return; // Stop running human UI logic below
+                } else if (currTurn == 2 && agentP2 != null)
+                {
+                    agentP2.RequestAction();
+                    return; // Stop running human UI logic below
+                }
+
+
+
 
                 for (int i = 0; i < P[0].Length; i++)
                 {
@@ -530,8 +557,9 @@ public class TurnSystem : MonoBehaviour
     private void AddOne()
     {
         SetHand(hands[currTurn - 1], GetHand(hands[currTurn - 1]) + 1);
+        int playerWhoAltered = currTurn - 1;
         TurnSwitch();
-        canAlter[GetOppPlayer(currTurn) - 1] = false;
+        canAlter[playerWhoAltered] = false;
 
     }
 
@@ -542,8 +570,9 @@ public class TurnSystem : MonoBehaviour
     private void SubtOne()
     {
         SetHand(hands[currTurn - 1], GetHand(hands[currTurn - 1]) - 1);
+        int playerWhoAltered = currTurn - 1;
         TurnSwitch();
-        canAlter[GetOppPlayer(currTurn) - 1] = false;
+        canAlter[playerWhoAltered] = false;
     }
 
     /// <summary>
@@ -553,8 +582,9 @@ public class TurnSystem : MonoBehaviour
     {
         SetHand(P[currTurn - 1][0], hand1);
         SetHand(P[currTurn - 1][1], hand2);
+        int playerWhoAltered = currTurn - 1;
         TurnSwitch();
-        canAlter[GetOppPlayer(currTurn) - 1] = false;
+        canAlter[playerWhoAltered] = false;
     }
 
 
@@ -731,7 +761,7 @@ public class TurnSystem : MonoBehaviour
     /// Allows the agent to directly use an alter button by inputting the action and hand index. <br/><br/>
     /// </summary>
     /// <param name="action">+ or - depending on the action (split is DirectSplit)</param>
-    /// <param name="handIndex">Index of the hand they want to alter (possibly used for highlighting in future)</param>
+    /// <param name="handIndex">Index of the hand they want to alter</param>
     public void DirectAlter(string action, int handIndex)
     {
         hands[currTurn - 1] = P[currTurn - 1][handIndex];
@@ -785,8 +815,47 @@ public class TurnSystem : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Forciably resets the entire board state back to a default 1-1 match setup. <br/><br/>
+    /// Called automatically by the Agent when an episode ends.
+    /// </summary>
+    public void ResetEnvironmentForAI()
+    {
+        // Reset all hand values back to 1
+        SetHand(P1H1, 1);
+        SetHand(P1H2, 1);
+        SetHand(P2H1, 1);
+        SetHand(P2H2, 1);
 
+        // Reset alteration availability flags
+        canAlter[0] = true;
+        canAlter[1] = true;
 
+        // Clean out stale selection array data
+        hands[0] = null;
+        hands[1] = null;
 
+        // Force turn back to Player 1 and restart loop
+        PlayerTurn(1);
+    }
+
+    /// <summary>
+    /// Check if the game is over without triggering visual UI panels. <br/><br/>
+    /// Returns 0 if active, 1 if P1 wins, 2 if P2 wins.
+    /// </summary>
+    public int CheckWinSilent()
+    {
+        if (GetHand(P1H1) == 0 && GetHand(P1H2) == 0) return 2; // P2 Wins
+        if (GetHand(P2H1) == 0 && GetHand(P2H2) == 0) return 1; // P1 Wins
+        return 0; // Game still active
+    }
+
+    /// <summary>
+    /// Returns the opposing agent based on the caller's player number.
+    /// </summary>
+    public SticksAgent GetOpponent(int playerIndex)
+    {
+        return playerIndex == 0 ? agentP1 : agentP2;
+    }
 
 }
