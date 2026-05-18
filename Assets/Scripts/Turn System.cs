@@ -194,7 +194,8 @@ public class TurnSystem : MonoBehaviour
 
                 for (int i = 0; i < P[0].Length; i++)
                 {
-                    if (GetHand(P[currPlayer - 1][i]) != 0)
+                    
+                    if (CanSelect(currPlayer - 1, i))
                     {
                         P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(activatedColor);
                         P[currPlayer - 1][i].GetComponent<HighlightScript>().SelectOn();
@@ -203,6 +204,7 @@ public class TurnSystem : MonoBehaviour
                     {
                         P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(new Color(0.5f, 0.5f, 0.5f, 0.5f)); //grey
                     }
+
                 }
 
 
@@ -222,6 +224,47 @@ public class TurnSystem : MonoBehaviour
     }
 
     /// <summary>
+    /// Checks if you can select based on the following rules: <br/><br/>
+    /// 1. You cannot attack dead hands <br/><br/>
+    /// 2. You cannot use dead hands to attack <br/><br/>
+    /// 3. You can use split or add one to a dead hand, but not subt one <br/><br/>
+    /// </summary>
+    /// <param name="playerIndex">The index of the player to check if it can be selected</param>
+    /// <param name="handIndex">The index of the hand to check if it can be selected</param>
+    /// <returns>Bool if it can be selected</returns>
+    private bool CanSelect(int playerIndex, int handIndex)
+    {
+        /*
+         * 
+        * You cannot select if:
+        * You are selecting your own hands and you cannot alter and the hand is dead
+        * You are selecting the opponent's hands after you have selected a dead hand
+        * You are selecting the opponent's dead hand
+        * 
+        */
+
+        bool isOwnHand = playerIndex + 1 == currTurn; //are you trying to select your own hands?
+        bool canIAlter = canAlter[currTurn - 1]; //can you use an alter button this turn?
+        int mySelectedHandValue = hands[currTurn - 1] != null ? GetHand(hands[currTurn - 1]) : -1; //if you have selected a hand, get its value, if not set to -1 so it doesn't interfere with rules
+
+        if (isOwnHand) //if you are selecting your own hands
+        {
+            if (canIAlter) return true; //if you can alter, you can select regardless of if it's dead or not
+            else if (GetHand(P[currTurn - 1][handIndex]) == 0) return false; //if you cannot alter and it's dead, cannot select
+            return true; //if it's not dead, can select
+        }
+        else //if you are selecting opponent's hands
+        {
+            if (mySelectedHandValue==0) return false; //if you have selected a dead hand, cannot select
+            if (GetHand(P[playerIndex][handIndex]) == 0) return false; //if opponent's hand is dead, cannot select
+        }
+
+        return true;
+
+    }
+
+
+    /// <summary>
     /// Turns off Alter Buttons and deselects all hands by changing them back to default color and turning off their highlight. <br/><br/>
     /// </summary>
     public void Deselect()
@@ -233,7 +276,7 @@ public class TurnSystem : MonoBehaviour
         {
             for (int i = 0; i < P[0].Length; i++)
             {
-                if (GetHand(P[j][i]) != 0)
+                if (CanSelect(j, i))
                 {
                     P[j][i].GetComponent<HighlightScript>().ChangeDefColor(Color.white);
                     P[j][i].GetComponent<HighlightScript>().SelectOff();
@@ -241,6 +284,7 @@ public class TurnSystem : MonoBehaviour
                 else
                 {
                     P[j][i].GetComponent<HighlightScript>().ChangeDefColor(new Color(0.5f, 0.5f, 0.5f, 0.5f)); //grey
+                    P[j][i].GetComponent<HighlightScript>().SelectOff();
                 }
 
 
