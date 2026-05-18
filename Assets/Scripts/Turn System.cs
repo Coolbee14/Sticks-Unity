@@ -477,7 +477,10 @@ public class TurnSystem : MonoBehaviour
             if (!b) SplitButtonsOff();
             alterButtons.SetActive(b);
             if (hands[currTurn - 1] != null)
+            {
                 subtOne.GetComponent<AlterButtons>().SetActive(GetHand(hands[currTurn - 1]) == 0 ? false : true);
+                addOne.GetComponent<AlterButtons>().SetActive(GetHand(hands[currTurn - 1]) == 4 ? false : true);
+            }
         }
     }
 
