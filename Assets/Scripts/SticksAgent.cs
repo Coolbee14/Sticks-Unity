@@ -17,6 +17,9 @@ public class SticksAgent : Agent
 
     private float maxHandValue = 4f; // Maximum fingers on a hand before it "dies"
 
+    private int aiHand1Prev = -1;
+    private int aiHand2Prev = -1;
+
     /// <summary>
     /// Step 1: Collect Observations. <br/><br/>
     /// Pass the state matrix down to the Python neural net.<br/><br/>
@@ -106,8 +109,7 @@ public class SticksAgent : Agent
 
         int enemyH1Before = turnSystem.GetHand(enemyIndex, 0);
         int enemyH2Before = turnSystem.GetHand(enemyIndex, 1);
-        int aiH1Before = turnSystem.GetHand(aiIndex, 0);
-        int aiH2Before = turnSystem.GetHand(aiIndex, 1);
+        
 
         // Retrieve and execute the step action safely
         int action = actions.DiscreteActions[0];
@@ -122,11 +124,15 @@ public class SticksAgent : Agent
         if (enemyH1Before > 0 && en1Value == 0) AddReward(0.25f);
         if (enemyH2Before > 0 && en2Value == 0) AddReward(0.25f);
 
+        
         if (action >= 0 && action <= 3)
         {
-            if (aiH1Before > 0 && ai1Value == 0) AddReward(-0.1f);
-            if (aiH2Before > 0 && ai2Value == 0) AddReward(-0.1f);
+            if (aiHand1Prev > 0 && ai1Value == 0) AddReward(-0.2f);
+            if (aiHand2Prev > 0 && ai2Value == 0) AddReward(-0.2f);
         }
+        
+        aiHand1Prev = ai1Value;
+        aiHand2Prev = ai2Value;
 
     }
 

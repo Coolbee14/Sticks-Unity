@@ -1,0 +1,66 @@
+{
+    "SticksBot": {
+        "checkpoints": [
+            {
+                "steps": 49992,
+                "file_path": "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-49992.onnx",
+                "reward": null,
+                "creation_time": 1779207215.0495157,
+                "auxillary_file_paths": [
+                    "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-49992.pt"
+                ]
+            },
+            {
+                "steps": 99998,
+                "file_path": "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-99998.onnx",
+                "reward": 7.2312499806284904,
+                "creation_time": 1779207276.9837642,
+                "auxillary_file_paths": [
+                    "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-99998.pt"
+                ]
+            },
+            {
+                "steps": 149940,
+                "file_path": "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-149940.onnx",
+                "reward": null,
+                "creation_time": 1779207339.0408645,
+                "auxillary_file_paths": [
+                    "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-149940.pt"
+                ]
+            },
+            {
+                "steps": 199986,
+                "file_path": "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-199986.onnx",
+                "reward": null,
+                "creation_time": 1779207400.7969995,
+                "auxillary_file_paths": [
+                    "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-199986.pt"
+                ]
+            },
+            {
+                "steps": 225106,
+                "file_path": "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-225106.onnx",
+                "reward": 9.299999997019768,
+                "creation_time": 1779207431.9847744,
+                "auxillary_file_paths": [
+                    "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-225106.pt"
+                ]
+            }
+        ],
+        "elo": 230.5717413312316,
+        "final_checkpoint": {
+            "steps": 225106,
+            "file_path": "results\\SticksFiveMin(1)\\SticksBot.onnx",
+            "reward": 9.299999997019768,
+            "creation_time": 1779207431.9847744,
+            "auxillary_file_paths": [
+                "results\\SticksFiveMin(1)\\SticksBot\\SticksBot-225106.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

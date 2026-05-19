@@ -215,9 +215,7 @@ public class TurnSystem : MonoBehaviour
                     if (agentP2 != null) agentP2.SetReward(1.0f);
                 }
 
-                // Signal ML-Agents to end the episode cleanly
-                if (agentP1 != null) agentP1.EndEpisode();
-                if (agentP2 != null) agentP2.EndEpisode();
+                
 
                 // Safely clear the board BEFORE a masked turn can be requested
                 ResetEnvironmentForAI();
@@ -852,6 +850,10 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     public void ResetEnvironmentForAI()
     {
+        // Signal ML-Agents to end the episode cleanly
+        if (agentP1 != null) agentP1.EndEpisode();
+        if (agentP2 != null) agentP2.EndEpisode();
+
         // Reset all hand values back to 1
         SetHand(P1H1, 1);
         SetHand(P1H2, 1);
@@ -872,9 +874,8 @@ public class TurnSystem : MonoBehaviour
         currTurn = 1;
 
 
-        //REMOVED - Force turn back to Player 1 and restart loop
-        //PlayerTurn(1);
-        //Apparently this loops the AI and it doesn't work
+        
+        PlayerTurn(1);
     }
 
     /// <summary>
