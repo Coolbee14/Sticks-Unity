@@ -21,10 +21,10 @@ behaviors:
     self_play:
       window: 10
       play_against_latest_model_ratio: 0.5
-      save_steps: 25000
-      swap_steps: 10000
-      team_change: 40000
-    max_steps: 225000
+      save_steps: 75000
+      swap_steps: 30000
+      team_change: 100000
+    max_steps: 675000
     time_horizon: 64
-    summary_freq: 10000
-    checkpoint_interval: 50000
+    summary_freq: 30000
+    checkpoint_interval: 150000

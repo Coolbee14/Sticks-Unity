@@ -2,8 +2,8 @@ behaviors:
   SticksBot:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 128
-      buffer_size: 2048
+      batch_size: 64
+      buffer_size: 1024
       learning_rate: 3.0e-4
       beta: 0.005
       epsilon: 0.2
@@ -21,10 +21,10 @@ behaviors:
     self_play:
       window: 10
       play_against_latest_model_ratio: 0.5
-      save_steps: 25000
-      swap_steps: 10000
-      team_change: 40000
-    max_steps: 225000
+      save_steps: 10000
+      swap_steps: 5000
+      team_change: 15000
+    max_steps: 75000
     time_horizon: 64
-    summary_freq: 10000
-    checkpoint_interval: 50000
+    summary_freq: 5000
+    checkpoint_interval: 25000
