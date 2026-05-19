@@ -101,7 +101,7 @@ public class SticksAgent : Agent
     /// </summary>
     public override void OnActionReceived(ActionBuffers actions)
     {
-        // Guard Check: Only proceed if it is actually this Agent's turn
+        
         if (turnSystem.GetCurrTurnIndex() != aiIndex) return;
 
         int enemyH1Before = turnSystem.GetHand(enemyIndex, 0);
@@ -109,66 +109,23 @@ public class SticksAgent : Agent
         int aiH1Before = turnSystem.GetHand(aiIndex, 0);
         int aiH2Before = turnSystem.GetHand(aiIndex, 1);
 
-
-        // Retrieve the single discrete choice from Branch 0 (Values 0 - 10)
+        // Retrieve and execute the step action safely
         int action = actions.DiscreteActions[0];
         ExecuteAIAction(action);
 
-        // Fetch post-action hand values to verify if the match has concluded
+        // Mid-game reward shaping evaluations
         int en1Value = turnSystem.GetHand(enemyIndex, 0);
         int en2Value = turnSystem.GetHand(enemyIndex, 1);
         int ai1Value = turnSystem.GetHand(aiIndex, 0);
         int ai2Value = turnSystem.GetHand(aiIndex, 1);
 
-        // ─── MINOR REWARD SHAPING ───
-        // ─── OFFENSIVE REWARDS (Pat on the back) ───
-        if (enemyH1Before > 0 && en1Value == 0) AddReward(0.25f); // Knocked out enemy H1
-        if (enemyH2Before > 0 && en2Value == 0) AddReward(0.25f); // Knocked out enemy H2
+        if (enemyH1Before > 0 && en1Value == 0) AddReward(0.25f);
+        if (enemyH2Before > 0 && en2Value == 0) AddReward(0.25f);
 
-
-        // ─── DEFENSIVE PUNISHMENTS (Slap on the wrist) ───
-        // If the AI hand was alive, but is now dead after the action cycle
         if (action >= 0 && action <= 3)
         {
-            if (aiH1Before > 0 && ai1Value == 0) AddReward(-0.1f); // AI Hand 1 went to zero
-            if (aiH2Before > 0 && ai2Value == 0) AddReward(-0.1f); // AI Hand 2 went to zero
-        }
-
-
-        // --- Check if either player has been wiped out ---
-        bool enDead = (en1Value == 0 && en2Value == 0);
-        bool aiDead = (ai1Value == 0 && ai2Value == 0);
-
-        if (enDead || aiDead)
-        {
-            SticksAgent opponent = turnSystem.GetOpponent(turnSystem.GetOppPlayer(aiPlayerNumber) - 1);
-            if (enDead)
-            {
-                SetReward(1.0f);       // Winner gets full prize
-                EndEpisode();          // End winner episode
-
-                if (opponent != null)
-                {
-                    opponent.AddReward(-1.0f); // Loser gets penalized
-                    opponent.EndEpisode();     // End loser episode
-                }
-            }
-            else //if AI died 
-            {
-                SetReward(-1.0f);      // I lost
-                EndEpisode();
-
-                if (opponent != null)
-                {
-                    opponent.AddReward(1.0f);  // Opponent won
-                    opponent.EndEpisode();
-                }
-            }
-
-            // 4. Safely wipe the board clear for the next match
-            turnSystem.ResetEnvironmentForAI();
-            return; // Exit out of the step entirely
-
+            if (aiH1Before > 0 && ai1Value == 0) AddReward(-0.1f);
+            if (aiH2Before > 0 && ai2Value == 0) AddReward(-0.1f);
         }
 
     }

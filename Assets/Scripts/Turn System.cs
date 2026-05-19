@@ -196,58 +196,86 @@ public class TurnSystem : MonoBehaviour
     public void PlayerSelect()
     {
         bool isAIGame = agentP1 != null || agentP2 != null;
-        bool isGameOver = isAIGame ? (CheckWinSilent() != 0) : CheckWin(); //if it's an AI game, use CheckWinSilent to avoid unnecessary UI updates, if it's not, use CheckWin to update the UI with the win
+        
 
-        if (!isGameOver)
+        if (isAIGame)
         {
-            Deselect();
-            if (currPlayer != 1 && currPlayer != 2) Error("PlayerSelect() > currPlayer did not equal 1 or 2");
-
-            else
+            int winStatus = CheckWinSilent();
+            if (winStatus != 0)
             {
-                //AI AGENT LOGIC
-                if(currTurn == 1 && agentP1 != null)
+                // Apply end-of-game rewards 
+                if (winStatus == 1)
                 {
-                    agentP1.RequestAction();
-                    return; // Stop running human UI logic below
-                } else if (currTurn == 2 && agentP2 != null)
+                    if (agentP1 != null) agentP1.SetReward(1.0f);
+                    if (agentP2 != null) agentP2.SetReward(-1.0f);
+                }
+                else if (winStatus == 2)
                 {
-                    agentP2.RequestAction();
-                    return; // Stop running human UI logic below
+                    if (agentP1 != null) agentP1.SetReward(-1.0f);
+                    if (agentP2 != null) agentP2.SetReward(1.0f);
                 }
 
+                // Signal ML-Agents to end the episode cleanly
+                if (agentP1 != null) agentP1.EndEpisode();
+                if (agentP2 != null) agentP2.EndEpisode();
+
+                // Safely clear the board BEFORE a masked turn can be requested
+                ResetEnvironmentForAI();
+                return;
+            }
+        } else {
+            if (CheckWin()) return;
+        }
+
+
+        Deselect();
+        if (currPlayer != 1 && currPlayer != 2) Error("PlayerSelect() > currPlayer did not equal 1 or 2");
+
+        else
+        {
+            //AI AGENT LOGIC
+            if(currTurn == 1 && agentP1 != null)
+            {
+                agentP1.RequestAction();
+                return; // Stop running human UI logic below
+            } else if (currTurn == 2 && agentP2 != null)
+            {
+                agentP2.RequestAction();
+                return; // Stop running human UI logic below
+            }
 
 
 
-                for (int i = 0; i < P[0].Length; i++)
-                {
+
+            for (int i = 0; i < P[0].Length; i++)
+            {
                     
-                    if (CanSelect(currPlayer - 1, i))
-                    {
-                        P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(activatedColor);
-                        P[currPlayer - 1][i].GetComponent<HighlightScript>().SelectOn();
-                    }
-                    else
-                    {
-                        P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(new Color(0.5f, 0.5f, 0.5f, 0.5f)); //grey
-                    }
-
-                }
-
-
-                if (hands[0] != null && hands[1] != null) //if both hands are selected
+                if (CanSelect(currPlayer - 1, i))
                 {
-                    Attack();
+                    P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(activatedColor);
+                    P[currPlayer - 1][i].GetComponent<HighlightScript>().SelectOn();
                 }
-
-                else if (hands[0] != null || hands[1] != null) //if one hand is selected
+                else
                 {
-                    AlterButtonsActive(true);
+                    P[currPlayer - 1][i].GetComponent<HighlightScript>().ChangeDefColor(new Color(0.5f, 0.5f, 0.5f, 0.5f)); //grey
                 }
 
             }
 
+
+            if (hands[0] != null && hands[1] != null) //if both hands are selected
+            {
+                Attack();
+            }
+
+            else if (hands[0] != null || hands[1] != null) //if one hand is selected
+            {
+                AlterButtonsActive(true);
+            }
+
         }
+
+        
     }
 
     /// <summary>
