@@ -1,0 +1,30 @@
+{
+    "SticksBot": {
+        "elo": 1055.450617896731,
+        "checkpoints": [
+            {
+                "steps": 5050,
+                "file_path": "results\\SticksTest_05\\SticksBot\\SticksBot-5050.onnx",
+                "reward": 0.140625,
+                "creation_time": 1779150472.9229388,
+                "auxillary_file_paths": [
+                    "results\\SticksTest_05\\SticksBot\\SticksBot-5050.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 5050,
+            "file_path": "results\\SticksTest_05\\SticksBot.onnx",
+            "reward": 0.140625,
+            "creation_time": 1779150472.9229388,
+            "auxillary_file_paths": [
+                "results\\SticksTest_05\\SticksBot\\SticksBot-5050.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

@@ -13,7 +13,7 @@ public class SticksAgent : Agent
     [SerializeField] private int aiPlayerNumber = 2; // AI defaults to Player 2 (Index 1)
 
     private int aiIndex => aiPlayerNumber - 1;
-    private int playerIndex => aiPlayerNumber == 2 ? 0 : 1;
+    private int enemyIndex => turnSystem.GetOppPlayer(aiPlayerNumber) - 1;
 
     private float maxHandValue = 4f; // Maximum fingers on a hand before it "dies"
 
@@ -26,8 +26,8 @@ public class SticksAgent : Agent
     {
         sensor.AddObservation(turnSystem.GetHand(aiIndex, 0) / maxHandValue);       // Observation 0: AI Hand 1 (0-4)
         sensor.AddObservation(turnSystem.GetHand(aiIndex, 1) / maxHandValue);       // Observation 1: AI Hand 2 (0-4)
-        sensor.AddObservation(turnSystem.GetHand(playerIndex, 0) / maxHandValue);   // Observation 2: Player Hand 1 (0-4)
-        sensor.AddObservation(turnSystem.GetHand(playerIndex, 1) / maxHandValue);   // Observation 3: Player Hand 2 (0-4)
+        sensor.AddObservation(turnSystem.GetHand(enemyIndex, 0) / maxHandValue);   // Observation 2: Player Hand 1 (0-4)
+        sensor.AddObservation(turnSystem.GetHand(enemyIndex, 1) / maxHandValue);   // Observation 3: Player Hand 2 (0-4)
         sensor.AddObservation(turnSystem.CanCurrPlayerAlter() ? 1f : 0f); // Observation 4: Alter Allowed? (1 or 0)
     }
 
@@ -41,20 +41,23 @@ public class SticksAgent : Agent
         if (turnSystem.GetCurrTurnIndex() != aiIndex)
         {
             for (int i = 0; i < 11; i++) actionMask.SetActionEnabled(0, i, false);
+            actionMask.SetActionEnabled(0, 11, true);
             return;
         }
 
+        actionMask.SetActionEnabled(0, 11, false); // Ensure the "No Action" option is always disabled on the AI's turn
+
         int aiH1 = turnSystem.GetHand(aiIndex, 0);
         int aiH2 = turnSystem.GetHand(aiIndex, 1);
-        int pH1 = turnSystem.GetHand(playerIndex, 0);
-        int pH2 = turnSystem.GetHand(playerIndex, 1);
+        int enH1 = turnSystem.GetHand(enemyIndex, 0);
+        int enH2 = turnSystem.GetHand(enemyIndex, 1);
         bool canAlter = turnSystem.CanCurrPlayerAlter();
 
         // --- Attack Constraints (Actions 0 - 3) ---
-        actionMask.SetActionEnabled(0, 0, aiH1 != 0 && pH1 != 0); // H1 attacks Player H1
-        actionMask.SetActionEnabled(0, 1, aiH1 != 0 && pH2 != 0); // H1 attacks Player H2
-        actionMask.SetActionEnabled(0, 2, aiH2 != 0 && pH1 != 0); // H2 attacks Player H1
-        actionMask.SetActionEnabled(0, 3, aiH2 != 0 && pH2 != 0); // H2 attacks Player H2
+        actionMask.SetActionEnabled(0, 0, aiH1 != 0 && enH1 != 0); // H1 attacks Player H1
+        actionMask.SetActionEnabled(0, 1, aiH1 != 0 && enH2 != 0); // H1 attacks Player H2
+        actionMask.SetActionEnabled(0, 2, aiH2 != 0 && enH1 != 0); // H2 attacks Player H1
+        actionMask.SetActionEnabled(0, 3, aiH2 != 0 && enH2 != 0); // H2 attacks Player H2
 
         // --- Alteration Constraints (Actions 4 - 7) ---
         if (!canAlter)
@@ -101,8 +104,8 @@ public class SticksAgent : Agent
         // Guard Check: Only proceed if it is actually this Agent's turn
         if (turnSystem.GetCurrTurnIndex() != aiIndex) return;
 
-        int enemyH1Before = turnSystem.GetHand(playerIndex, 0);
-        int enemyH2Before = turnSystem.GetHand(playerIndex, 1);
+        int enemyH1Before = turnSystem.GetHand(enemyIndex, 0);
+        int enemyH2Before = turnSystem.GetHand(enemyIndex, 1);
         int aiH1Before = turnSystem.GetHand(aiIndex, 0);
         int aiH2Before = turnSystem.GetHand(aiIndex, 1);
 
@@ -112,15 +115,15 @@ public class SticksAgent : Agent
         ExecuteAIAction(action);
 
         // Fetch post-action hand values to verify if the match has concluded
-        int p1Value = turnSystem.GetHand(playerIndex, 0);
-        int p2Value = turnSystem.GetHand(playerIndex, 1);
+        int en1Value = turnSystem.GetHand(enemyIndex, 0);
+        int en2Value = turnSystem.GetHand(enemyIndex, 1);
         int ai1Value = turnSystem.GetHand(aiIndex, 0);
         int ai2Value = turnSystem.GetHand(aiIndex, 1);
 
         // ─── MINOR REWARD SHAPING ───
         // ─── OFFENSIVE REWARDS (Pat on the back) ───
-        if (enemyH1Before > 0 && p1Value == 0) AddReward(0.25f); // Knocked out enemy H1
-        if (enemyH2Before > 0 && p2Value == 0) AddReward(0.25f); // Knocked out enemy H2
+        if (enemyH1Before > 0 && en1Value == 0) AddReward(0.25f); // Knocked out enemy H1
+        if (enemyH2Before > 0 && en2Value == 0) AddReward(0.25f); // Knocked out enemy H2
 
 
         // ─── DEFENSIVE PUNISHMENTS (Slap on the wrist) ───
@@ -133,22 +136,13 @@ public class SticksAgent : Agent
 
 
         // --- Check if either player has been wiped out ---
-        bool p1Dead = (p1Value == 0 && p2Value == 0);
-        bool p2Dead = (ai1Value == 0 && ai2Value == 0);
+        bool enDead = (en1Value == 0 && en2Value == 0);
+        bool aiDead = (ai1Value == 0 && ai2Value == 0);
 
-        if (p1Dead || p2Dead)
+        if (enDead || aiDead)
         {
-            // 1. Determine if THIS specific agent instance won or lost
-            // If I am Player 1 and Player 2 is dead, I win. If I am Player 2 and Player 1 is dead, I win.
-            bool iAmP1 = aiPlayerNumber == 1;
-            bool p1Won = p2Dead;
-            bool iWon = (iAmP1 && p1Won) || (!iAmP1 && !p1Won);
-
-            // 2. Fetch our opponent agent through the turn system hub
             SticksAgent opponent = turnSystem.GetOpponent(turnSystem.GetOppPlayer(aiPlayerNumber) - 1);
-
-            // 3. Hand out rewards to both sides and cut off the episodes simultaneously
-            if (iWon)
+            if (enDead)
             {
                 SetReward(1.0f);       // Winner gets full prize
                 EndEpisode();          // End winner episode
@@ -159,7 +153,7 @@ public class SticksAgent : Agent
                     opponent.EndEpisode();     // End loser episode
                 }
             }
-            else
+            else //if AI died 
             {
                 SetReward(-1.0f);      // I lost
                 EndEpisode();
@@ -174,7 +168,9 @@ public class SticksAgent : Agent
             // 4. Safely wipe the board clear for the next match
             turnSystem.ResetEnvironmentForAI();
             return; // Exit out of the step entirely
+
         }
+
     }
 
 
@@ -202,6 +198,8 @@ public class SticksAgent : Agent
             case 8: turnSystem.DirectSplit(0); break; // Split combination option 1
             case 9: turnSystem.DirectSplit(1); break; // Split combination option 2
             case 10: turnSystem.DirectSplit(2); break; // Split combination option 3
+
+            case 11: break; // No Action (Only when it's not the AI's turn)
         }
     }
 

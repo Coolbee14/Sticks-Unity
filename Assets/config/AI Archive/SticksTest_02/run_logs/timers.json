@@ -1,0 +1,42 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1779149408",
+        "python_version": "3.10.12 | packaged by Anaconda, Inc. | (main, Jul  5 2023, 19:01:18) [MSC v.1916 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\mcsto\\anaconda3\\envs\\mlagents\\Scripts\\mlagents-learn sticks_test.yaml --run-id=SticksTest_02",
+        "mlagents_version": "1.1.0",
+        "mlagents_envs_version": "1.1.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "2.2.2+cu121",
+        "numpy_version": "1.23.5",
+        "end_time_seconds": "1779149474"
+    },
+    "total": 66.13933709997218,
+    "count": 1,
+    "self": 0.005427099938970059,
+    "children": {
+        "run_training.setup": {
+            "total": 0.07281770004192367,
+            "count": 1,
+            "self": 0.07281770004192367
+        },
+        "TrainerController.start_learning": {
+            "total": 66.06109229999129,
+            "count": 1,
+            "self": 0.0001218999968841672,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 66.06095119996462,
+                    "count": 1,
+                    "self": 66.06095119996462
+                },
+                "TrainerController._save_models": {
+                    "total": 1.9200029782950878e-05,
+                    "count": 1,
+                    "self": 1.9200029782950878e-05
+                }
+            }
+        }
+    }
+}

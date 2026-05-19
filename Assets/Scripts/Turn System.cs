@@ -445,6 +445,9 @@ public class TurnSystem : MonoBehaviour
     private void SetHand(GameObject obj, int num)
     {
         obj.GetComponentInChildren<TextMeshPro>().text = (num % 5) + "";
+        //int playerIndex = (int)char.GetNumericValue(obj.name[1]) - 1; //P#H# - gets first number
+        //int handIndex = (int)char.GetNumericValue(obj.name[3]) - 1; //P#H# - gets second number
+        //P[playerIndex][handIndex] = obj; //updates the P array with the new hand value
     }
 
     /// <summary>
@@ -835,8 +838,15 @@ public class TurnSystem : MonoBehaviour
         hands[0] = null;
         hands[1] = null;
 
-        // Force turn back to Player 1 and restart loop
-        PlayerTurn(1);
+        Reset();
+
+        currPlayer = 1;
+        currTurn = 1;
+
+
+        //REMOVED - Force turn back to Player 1 and restart loop
+        //PlayerTurn(1);
+        //Apparently this loops the AI and it doesn't work
     }
 
     /// <summary>
