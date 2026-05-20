@@ -206,13 +206,13 @@ public class TurnSystem : MonoBehaviour
                 // Apply end-of-game rewards 
                 if (winStatus == 1)
                 {
-                    if (agentP1 != null) agentP1.SetReward(1.0f);
-                    if (agentP2 != null) agentP2.SetReward(-1.0f);
+                    if (agentP1 != null) agentP1.AddReward(1.0f);
+                    if (agentP2 != null) agentP2.AddReward(-1.0f);
                 }
                 else if (winStatus == 2)
                 {
-                    if (agentP1 != null) agentP1.SetReward(-1.0f);
-                    if (agentP2 != null) agentP2.SetReward(1.0f);
+                    if (agentP1 != null) agentP1.AddReward(-1.0f);
+                    if (agentP2 != null) agentP2.AddReward(1.0f);
                 }
 
                 
@@ -387,6 +387,8 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     private void TurnSwitch()
     {
+        if (agentP1 != null && currTurn == 1) agentP1.AddReward(-0.01f);
+        if (agentP2 != null && currTurn == 2) agentP2.AddReward(-0.01f);
         canAlter[currTurn - 1] = true;
         currTurn = GetOppPlayer(currTurn);
         currPlayer = currTurn;
@@ -471,9 +473,6 @@ public class TurnSystem : MonoBehaviour
     private void SetHand(GameObject obj, int num)
     {
         obj.GetComponentInChildren<TextMeshPro>().text = (num % 5) + "";
-        //int playerIndex = (int)char.GetNumericValue(obj.name[1]) - 1; //P#H# - gets first number
-        //int handIndex = (int)char.GetNumericValue(obj.name[3]) - 1; //P#H# - gets second number
-        //P[playerIndex][handIndex] = obj; //updates the P array with the new hand value
     }
 
     /// <summary>
@@ -496,6 +495,10 @@ public class TurnSystem : MonoBehaviour
         obj.GetComponentInChildren<TextMeshPro>().text = text;
     }
 
+    private int CharToInt(char ch)
+    {
+        return (int)Char.GetNumericValue(ch);
+    }
 
     /// <summary>
     /// Uses the current turn to figure out the attacker and defender, adds hand values together and mods by 5 for overflow<br/><br/>
@@ -507,6 +510,21 @@ public class TurnSystem : MonoBehaviour
         int defender = GetHand(hands[GetOppPlayer(currTurn) - 1]);
         defender = (defender + attacker) % 5;
         SetHand(hands[GetOppPlayer(currTurn) - 1], defender);
+        if (defender == 0)
+        {
+            if (currTurn == 1 && agentP1 != null)
+            {
+                if( CharToInt(hands[GetOppPlayer(currTurn) - 1].name[3]) == 1 ) agentP1.KilledEnemyHand1();
+                else if (CharToInt(hands[GetOppPlayer(currTurn) - 1].name[3]) == 2) agentP1.KilledEnemyHand2();
+                else Error("Attack() > Could not determine which hand was killed based on name");
+            }
+            else if (currTurn == 2 && agentP2 != null)
+            {
+                if (CharToInt(hands[GetOppPlayer(currTurn) - 1].name[3]) == 1) agentP2.KilledEnemyHand1();
+                else if (CharToInt(hands[GetOppPlayer(currTurn) - 1].name[3]) == 2) agentP2.KilledEnemyHand2();
+                else Error("Attack() > Could not determine which hand was killed based on name");
+            }
+        }
         TurnSwitch();
 
     }

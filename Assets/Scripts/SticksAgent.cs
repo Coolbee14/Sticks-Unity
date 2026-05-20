@@ -20,6 +20,9 @@ public class SticksAgent : Agent
     private int aiHand1Prev = -1;
     private int aiHand2Prev = -1;
 
+    private bool hasKilledEnemyH1 = false;
+    private bool hasKilledEnemyH2 = false;
+
     /// <summary>
     /// Step 1: Collect Observations. <br/><br/>
     /// Pass the state matrix down to the Python neural net.<br/><br/>
@@ -107,10 +110,6 @@ public class SticksAgent : Agent
         
         if (turnSystem.GetCurrTurnIndex() != aiIndex) return;
 
-        int enemyH1Before = turnSystem.GetHand(enemyIndex, 0);
-        int enemyH2Before = turnSystem.GetHand(enemyIndex, 1);
-        
-
         // Retrieve and execute the step action safely
         int action = actions.DiscreteActions[0];
         ExecuteAIAction(action);
@@ -121,8 +120,6 @@ public class SticksAgent : Agent
         int ai1Value = turnSystem.GetHand(aiIndex, 0);
         int ai2Value = turnSystem.GetHand(aiIndex, 1);
 
-        if (enemyH1Before > 0 && en1Value == 0) AddReward(0.25f);
-        if (enemyH2Before > 0 && en2Value == 0) AddReward(0.25f);
 
         
         if (action >= 0 && action <= 3)
@@ -186,6 +183,24 @@ public class SticksAgent : Agent
         discreteActions[0] = chosenAction;
     }
 
+
+    public void KilledEnemyHand1()
+    {
+        if (!hasKilledEnemyH1)
+        {
+            AddReward(0.25f);
+            hasKilledEnemyH1 = true;
+        }
+    }
+
+    public void KilledEnemyHand2()
+    {
+        if (!hasKilledEnemyH2)
+        {
+            AddReward(0.25f);
+            hasKilledEnemyH2 = true;
+        }
+    }
 
 
 }
