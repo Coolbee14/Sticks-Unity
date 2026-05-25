@@ -120,13 +120,9 @@ public class SticksAgent : Agent
         int ai1Value = turnSystem.GetHand(aiIndex, 0);
         int ai2Value = turnSystem.GetHand(aiIndex, 1);
 
-
         
-        if (action >= 0 && action <= 3)
-        {
-            if (aiHand1Prev > 0 && ai1Value == 0) AddReward(-0.2f);
-            if (aiHand2Prev > 0 && ai2Value == 0) AddReward(-0.2f);
-        }
+        if (aiHand1Prev > 0 && ai1Value == 0) AddReward(-0.2f);
+        if (aiHand2Prev > 0 && ai2Value == 0) AddReward(-0.2f);
         
         aiHand1Prev = ai1Value;
         aiHand2Prev = ai2Value;
