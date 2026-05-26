@@ -112,6 +112,8 @@ public class SticksAgent : Agent
 
         // Retrieve and execute the step action safely
         int action = actions.DiscreteActions[0];
+        if (action >= 0 && action <= 3) AddReward(0.005f);
+        AddReward(-0.01f);
         ExecuteAIAction(action);
 
         // Mid-game reward shaping evaluations

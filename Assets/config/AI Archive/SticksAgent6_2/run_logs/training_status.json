@@ -1,0 +1,66 @@
+{
+    "SticksBot": {
+        "checkpoints": [
+            {
+                "steps": 149976,
+                "file_path": "results\\SticksAgent6_2\\SticksBot\\SticksBot-149976.onnx",
+                "reward": -0.5736841841747886,
+                "creation_time": 1779745563.838931,
+                "auxillary_file_paths": [
+                    "results\\SticksAgent6_2\\SticksBot\\SticksBot-149976.pt"
+                ]
+            },
+            {
+                "steps": 299958,
+                "file_path": "results\\SticksAgent6_2\\SticksBot\\SticksBot-299958.onnx",
+                "reward": -0.7249999940395355,
+                "creation_time": 1779745749.8536296,
+                "auxillary_file_paths": [
+                    "results\\SticksAgent6_2\\SticksBot\\SticksBot-299958.pt"
+                ]
+            },
+            {
+                "steps": 449954,
+                "file_path": "results\\SticksAgent6_2\\SticksBot\\SticksBot-449954.onnx",
+                "reward": null,
+                "creation_time": 1779745934.8036492,
+                "auxillary_file_paths": [
+                    "results\\SticksAgent6_2\\SticksBot\\SticksBot-449954.pt"
+                ]
+            },
+            {
+                "steps": 599986,
+                "file_path": "results\\SticksAgent6_2\\SticksBot\\SticksBot-599986.onnx",
+                "reward": -2.4949999302625656,
+                "creation_time": 1779746121.016694,
+                "auxillary_file_paths": [
+                    "results\\SticksAgent6_2\\SticksBot\\SticksBot-599986.pt"
+                ]
+            },
+            {
+                "steps": 675050,
+                "file_path": "results\\SticksAgent6_2\\SticksBot\\SticksBot-675050.onnx",
+                "reward": -1.1607691943645477,
+                "creation_time": 1779746213.9055412,
+                "auxillary_file_paths": [
+                    "results\\SticksAgent6_2\\SticksBot\\SticksBot-675050.pt"
+                ]
+            }
+        ],
+        "elo": -0.03799089083974916,
+        "final_checkpoint": {
+            "steps": 675050,
+            "file_path": "results\\SticksAgent6_2\\SticksBot.onnx",
+            "reward": -1.1607691943645477,
+            "creation_time": 1779746213.9055412,
+            "auxillary_file_paths": [
+                "results\\SticksAgent6_2\\SticksBot\\SticksBot-675050.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

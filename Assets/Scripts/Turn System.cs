@@ -387,8 +387,6 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     private void TurnSwitch()
     {
-        if (agentP1 != null && currTurn == 1) agentP1.AddReward(-0.01f);
-        if (agentP2 != null && currTurn == 2) agentP2.AddReward(-0.01f);
         canAlter[currTurn - 1] = true;
         currTurn = GetOppPlayer(currTurn);
         currPlayer = currTurn;
